@@ -62,3 +62,35 @@ done
 
 # Compilation flags
 # export ARCHFLAGS="-arch x86_64"
+# pnpm
+export PNPM_HOME="/Users/jchiatt/Library/pnpm"
+export PATH="$PNPM_HOME:$PATH"
+# pnpm end
+PATH="/Users/jchiatt/perl5/bin${PATH:+:${PATH}}"; export PATH;
+PERL5LIB="/Users/jchiatt/perl5/lib/perl5${PERL5LIB:+:${PERL5LIB}}"; export PERL5LIB;
+PERL_LOCAL_LIB_ROOT="/Users/jchiatt/perl5${PERL_LOCAL_LIB_ROOT:+:${PERL_LOCAL_LIB_ROOT}}"; export PERL_LOCAL_LIB_ROOT;
+PERL_MB_OPT="--install_base \"/Users/jchiatt/perl5\""; export PERL_MB_OPT;
+PERL_MM_OPT="INSTALL_BASE=/Users/jchiatt/perl5"; export PERL_MM_OPT;
+
+# pyenv
+eval "$(pyenv init --path)"
+eval "$(pyenv init -)"
+eval "$(pyenv virtualenv-init -)"
+# end pyenv
+export PATH="/opt/homebrew/opt/mysql@8.4/bin:$PATH"
+
+
+# Herd injected PHP 8.3 configuration.
+export HERD_PHP_83_INI_SCAN_DIR="/Users/jchiatt/Library/Application Support/Herd/config/php/83/"
+
+
+# Herd injected PHP binary.
+export PATH="/Users/jchiatt/Library/Application Support/Herd/bin/":$PATH
+
+# Android Studio environment variables
+export ANDROID_HOME=$HOME/Library/Android/sdk
+export PATH=$PATH:$ANDROID_HOME/emulator
+export PATH=$PATH:$ANDROID_HOME/platform-tools
+
+# AWS Elastic Beanstalk CLI
+export PATH=$PATH:/Users/jchiatt/.local/bin
