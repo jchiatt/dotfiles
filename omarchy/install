@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+# Set up jc's Omarchy config: packages, oh-my-zsh, and symlinks from ./home into $HOME.
+# Safe to re-run. Existing files are moved aside as <file>.pre-dotfiles.<timestamp>.
+set -euo pipefail
+
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+STAMP=$(date +%s)
+
+# 1. Packages
+missing=()
+for pkg in zsh zsh-autosuggestions zsh-syntax-highlighting; do
+  pacman -Qq "$pkg" &>/dev/null || missing+=("$pkg")
+done
+if ((${#missing[@]})); then
+  echo "Installing: ${missing[*]}"
+  omarchy pkg add "${missing[@]}"
+fi
+
+# 2. oh-my-zsh
+if [[ ! -d ~/.local/share/oh-my-zsh ]]; then
+  git clone --depth 1 https://github.com/ohmyzsh/ohmyzsh.git ~/.local/share/oh-my-zsh
+fi
+
+# 3. Symlinks
+cd "$DIR/home"
+find . -type f | sort | while read -r rel; do
+  src="$DIR/home/${rel#./}"
+  dest="$HOME/${rel#./}"
+  mkdir -p "$(dirname "$dest")"
+  if [[ -L $dest && $(readlink "$dest") == "$src" ]]; then
+    continue
+  fi
+  if [[ -e $dest || -L $dest ]]; then
+    mv "$dest" "$dest.pre-dotfiles.$STAMP"
+    echo "backed up  ~/${rel#./}"
+  fi
+  ln -s "$src" "$dest"
+  echo "linked     ~/${rel#./}"
+done
+
+# 4. Apply
+command -v hyprctl &>/dev/null && hyprctl reload >/dev/null && hyprctl configerrors
+if [[ $(getent passwd "$USER" | cut -d: -f7) != */zsh ]]; then
+  echo
+  echo "Make zsh your login shell with:  chsh -s /usr/bin/zsh   (then log out and back in)"
+fi
+echo "Done. tmux plugins install automatically the first time tmux starts."

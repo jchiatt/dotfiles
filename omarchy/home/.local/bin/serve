@@ -1,0 +1,32 @@
+#!/usr/bin/env python3
+"""Serve a file (or the current directory) over HTTP.
+
+Usage: serve [PORT] [FILE]   (default port 8080, default: current directory)
+"""
+import functools, http.server, os, sys
+
+args = sys.argv[1:]
+if args and args[0] in ("-h", "--help"):
+    print(__doc__); sys.exit()
+
+port = 8080
+if args and args[0].isdigit():
+    port, args = int(args[0]), args[1:]
+
+directory = os.getcwd()
+if args:
+    path = os.path.abspath(args[0])
+    directory = os.path.dirname(path) if os.path.isfile(path) else path
+
+class Utf8Handler(http.server.SimpleHTTPRequestHandler):
+    extensions_map = {k: v + "; charset=UTF-8"
+                      for k, v in http.server.SimpleHTTPRequestHandler.extensions_map.items()}
+    extensions_map[""] = "text/plain; charset=UTF-8"
+
+Handler = functools.partial(Utf8Handler, directory=directory)
+
+print(f"http://localhost:{port}/")
+try:
+    http.server.ThreadingHTTPServer(("", port), Handler).serve_forever()
+except KeyboardInterrupt:
+    pass

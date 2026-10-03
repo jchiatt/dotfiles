@@ -1,0 +1,7 @@
+#!/bin/bash
+# Show/hide the agent's special workspace; launch an agent if it's empty.
+if hyprctl clients -j | jq -e 'any(.[]; .workspace.name == "special:agent")' >/dev/null; then
+  hyprctl dispatch 'hl.dsp.workspace.toggle_special("agent")'
+else
+  exec omarchy-agent --pick
+fi
