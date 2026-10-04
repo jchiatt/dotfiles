@@ -131,3 +131,23 @@ docker-helper() {
   docker volume create --name "$dst" >/dev/null
   docker run --rm -v "$src":/from -v "$dst":/to alpine ash -c "cd /from && cp -av . /to"
 }
+
+###
+# hda <ai> [<second_ai>]: agent-first Herdr layout (no editor).
+#   main AI on the left (60%), optional second AI on the right, shell strip along the bottom.
+#   e.g. `hda cx cy` → Claude + Codex. Need an editor? Alt+Enter to split, then `n`.
+hda() {
+  if [[ -z $1 ]]; then echo "Usage: hda <ai> [<second_ai>]   e.g. hda cx cy"; return 1; fi
+  if [[ -z $HERDR_PANE_ID ]]; then echo "Run hda inside herdr (Super+Ctrl+Enter)."; return 1; fi
+  local dir=$PWD main=$HERDR_PANE_ID second
+  _hda_split() { herdr pane split "$1" --direction "$2" --ratio "$3" --cwd "$dir" --no-focus | jq -r '.result.pane.pane_id'; }
+
+  herdr tab rename "$HERDR_TAB_ID" "${dir:t}" >/dev/null
+  _hda_split "$main" down 0.85 >/dev/null              # bottom 15%: shell
+  if [[ -n $2 ]]; then
+    second=$(_hda_split "$main" right 0.6)             # right 40%: second AI
+    herdr pane run "$second" "$2" >/dev/null
+  fi
+  herdr pane run "$main" "$1" >/dev/null               # left: main AI
+  unfunction _hda_split
+}
