@@ -51,6 +51,12 @@
 hl.config({
   input = {
     kb_options = "ctrl:nocaps,altwin:swap_lalt_lwin,compose:ralt,shift:both_capslock_cancel",
+
+    -- Mac-style "natural" (inverted) scrolling for mice and the touchpad
+    natural_scroll = true,
+    touchpad = {
+      natural_scroll = true,
+    },
   },
 })
 
