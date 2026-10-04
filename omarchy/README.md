@@ -23,6 +23,7 @@ directories), so editing the live files edits the repo.
 | `.config/hypr/input.lua` | Caps Lock → Ctrl, Left Alt ↔ Super (Mac-style), Compose on Right Alt. |
 | `.config/hypr/bindings.lua` | `Super+Tab` cycles windows, `Super+Alt+C` centers floating window, `Super+A` toggles the agent. |
 | `.config/hypr/hyprland.lua` | Agent windows live in the `special:agent` workspace. |
+| `.config/voxtype/config.toml` | Voxtype dictation (hold **F9** / toggle **Super+Ctrl+X**) using the `small.en` Whisper model. The installer installs `voxtype-bin` + `wtype`, downloads the configured model, enables the user service, and turns on Vulkan GPU acceleration when available. |
 | `.local/bin/` | `agent-toggle`, `dirsize`, `eachdir`, `pid`, `serve` (Python 3), `ssh-with-reverse`. |
 | `.config/omarchy/themes/rafl` | **rafl** theme (Plum by night): rafl design-system palette, Rose gradient borders, confetti wallpapers, wordmark lock screen. `omarchy theme set rafl` |
 | `.config/omarchy/themes/rafl-blush` | **rafl Blush** (Blush by day): light variant — flat blush surfaces, plum ink, no gold on light. `omarchy theme set rafl-blush` |

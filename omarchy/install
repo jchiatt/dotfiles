@@ -8,7 +8,7 @@ STAMP=$(date +%s)
 
 # 1. Packages
 missing=()
-for pkg in zsh zsh-autosuggestions zsh-syntax-highlighting; do
+for pkg in zsh zsh-autosuggestions zsh-syntax-highlighting voxtype-bin wtype; do
   pacman -Qq "$pkg" &>/dev/null || missing+=("$pkg")
 done
 if ((${#missing[@]})); then
@@ -47,7 +47,19 @@ for theme in .config/omarchy/themes/*/; do
   [[ -d $theme ]] && link "${theme%/}"
 done
 
-# 4. Apply
+# 4. Voxtype dictation (config is linked above; model + service + GPU here)
+if command -v voxtype &>/dev/null; then
+  model=$(sed -n 's/^model *= *"\(.*\)"/\1/p' ~/.config/voxtype/config.toml)
+  [[ -f ~/.local/share/voxtype/models/ggml-$model.bin ]] || voxtype setup --download --model "$model" --quiet
+  systemctl --user is-enabled voxtype &>/dev/null || voxtype setup systemd >/dev/null
+  gpu_status=$(voxtype setup gpu 2>/dev/null || true)
+  if omarchy-hw-vulkan && [[ $gpu_status != *"GPU (Vulkan) - active"* ]]; then
+    sudo voxtype setup gpu --enable
+  fi
+  systemctl --user restart voxtype
+fi
+
+# 5. Apply
 command -v hyprctl &>/dev/null && hyprctl reload >/dev/null && hyprctl configerrors
 if [[ $(getent passwd "$USER" | cut -d: -f7) != */zsh ]]; then
   echo
