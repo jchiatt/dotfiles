@@ -9,7 +9,8 @@ git clone https://github.com/jchiatt/dotfiles.git ~/Work/dotfiles
 ~/Work/dotfiles/omarchy/install
 ```
 
-Everything under `home/` is symlinked into `$HOME`, so editing the live files edits the repo.
+Everything under `home/` is symlinked into `$HOME` (files individually; Omarchy themes as whole
+directories), so editing the live files edits the repo.
 
 ## What's here
 
@@ -23,3 +24,5 @@ Everything under `home/` is symlinked into `$HOME`, so editing the live files ed
 | `.config/hypr/bindings.lua` | `Super+Tab` cycles windows, `Super+Alt+C` centers floating window, `Super+A` toggles the agent. |
 | `.config/hypr/hyprland.lua` | Agent windows live in the `special:agent` workspace. |
 | `.local/bin/` | `agent-toggle`, `dirsize`, `eachdir`, `pid`, `serve` (Python 3), `ssh-with-reverse`. |
+| `.config/omarchy/themes/rafl` | **rafl** theme (Plum by night): rafl design-system palette, Rose gradient borders, confetti wallpapers, wordmark lock screen. `omarchy theme set rafl` |
+| `.config/omarchy/themes/rafl-blush` | **rafl Blush** (Blush by day): light variant — flat blush surfaces, plum ink, no gold on light. `omarchy theme set rafl-blush` |

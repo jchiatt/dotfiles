@@ -1,0 +1,37 @@
+# rafl — "The Neon Gala", Plum by night.
+# Derived from rafl/design-system/styles.css (dark surface tokens + Rose/Gold brand colors).
+mode = "dark"
+
+accent = "#E91E63"            # primary (Rose)
+selection = "#5A0F41"         # dark-surface-bright
+muted = "#8A6579"             # on-surface-variant
+
+background = "#240019"        # dark-surface (Plum)
+dark_background = "#1E0012"   # dark-surface-container-lowest
+darker_background = "#16000D"
+lighter_background = "#370528" # dark-surface-container
+
+foreground = "#F5E6EE"        # dark-on-surface
+dark_foreground = "#A08294"   # dark-on-surface-variant
+light_foreground = "#E6D0DC"
+bright_foreground = "#FFFBFC" # surface-container-lowest
+
+red = "#FF4F64"
+yellow = "#FFF575"            # secondary (Gold) — rewards, highlights
+orange = "#FFB04A"
+green = "#8FE3B0"
+cyan = "#7FD4DE"
+blue = "#B79CFF"
+magenta = "#FF7290"           # primary-container
+brown = "#8A4B5E"
+
+bright_red = "#FF7A8A"
+bright_yellow = "#FFE03A"     # secondary-container
+bright_green = "#B5F0CB"
+bright_cyan = "#A8E6EE"
+bright_blue = "#D0BDFF"
+bright_magenta = "#FF9DB4"
+
+# Signature Rose gradient on the active window border
+hyprland_active_border = "rgba(e91e63ee) rgba(ff7290ee) 45deg"
+hyprland_inactive_border = "rgba(490a36aa)"

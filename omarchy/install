@@ -22,20 +22,29 @@ if [[ ! -d ~/.local/share/oh-my-zsh ]]; then
 fi
 
 # 3. Symlinks
-cd "$DIR/home"
-find . -type f | sort | while read -r rel; do
-  src="$DIR/home/${rel#./}"
-  dest="$HOME/${rel#./}"
+link() {
+  local rel=$1 src="$DIR/home/$1" dest="$HOME/$1"
   mkdir -p "$(dirname "$dest")"
   if [[ -L $dest && $(readlink "$dest") == "$src" ]]; then
-    continue
+    return
   fi
   if [[ -e $dest || -L $dest ]]; then
     mv "$dest" "$dest.pre-dotfiles.$STAMP"
-    echo "backed up  ~/${rel#./}"
+    echo "backed up  ~/$rel"
   fi
   ln -s "$src" "$dest"
-  echo "linked     ~/${rel#./}"
+  echo "linked     ~/$rel"
+}
+
+cd "$DIR/home"
+# Files are linked one by one, except Omarchy themes: each theme directory is
+# linked whole (omarchy theme set copies themes with cp -r, which would copy
+# per-file symlinks as dangling-prone links instead of their contents).
+find . -path ./.config/omarchy/themes -prune -o -type f -print | sort | while read -r rel; do
+  link "${rel#./}"
+done
+for theme in .config/omarchy/themes/*/; do
+  [[ -d $theme ]] && link "${theme%/}"
 done
 
 # 4. Apply

@@ -1,0 +1,37 @@
+# rafl Blush — "The Neon Gala", Blush by day.
+# Derived from rafl/design-system/styles.css (light surface tokens + Rose).
+# Per the design system, Gold never sits on light surfaces, so yellow here is a deep amber.
+mode = "light"
+
+accent = "#E91E63"            # primary (Rose)
+selection = "#F3D0E0"
+muted = "#A6889A"
+
+background = "#FAF1F5"        # surface (Blush)
+dark_background = "#F5E8EE"
+darker_background = "#EBD6E0"
+lighter_background = "#F3E2EA" # surface-container-high (tiles/chips)
+
+foreground = "#2A0A1D"        # on-surface (plum ink)
+dark_foreground = "#8A6579"   # on-surface-variant
+light_foreground = "#4A2A3C"
+bright_foreground = "#2A0A1D"
+
+red = "#C8102E"
+yellow = "#A86B00"
+orange = "#C25E00"
+green = "#1E8A55"
+cyan = "#0E7C86"
+blue = "#5B3FD1"
+magenta = "#C2185B"
+brown = "#7A3E52"
+
+bright_red = "#E0344F"
+bright_yellow = "#C98A00"
+bright_green = "#26A267"
+bright_cyan = "#1597A1"
+bright_blue = "#7357E6"
+bright_magenta = "#E91E63"
+
+hyprland_active_border = "rgba(e91e63ee) rgba(ff7290ee) 45deg"
+hyprland_inactive_border = "rgba(d9bccbaa)"
