@@ -1,7 +1,21 @@
 #!/bin/bash
-# Show/hide the agent's special workspace; launch an agent if it's empty.
-if hyprctl clients -j | jq -e 'any(.[]; .workspace.name == "special:agent")' >/dev/null; then
-  hyprctl dispatch 'hl.dsp.workspace.toggle_special("agent")'
-else
+# SUPER+A: show/hide the coding agent.
+# An "agent" is any window tagged `agent`, of class org.omarchy.agent, or living in
+# the special:agent workspace. Agents that wander onto a normal workspace are sent
+# back (hidden); otherwise the workspace is toggled. With no agent, launch one.
+clients=$(hyprctl clients -j)
+is_agent='(.tags | index("agent")) or .class == "org.omarchy.agent" or .workspace.name == "special:agent"'
+
+if ! jq -e "any(.[]; $is_agent)" <<<"$clients" >/dev/null; then
   exec omarchy-agent --pick
 fi
+
+strays=$(jq -r ".[] | select(($is_agent) and .workspace.name != \"special:agent\") | .address" <<<"$clients")
+if [[ -n $strays ]]; then
+  for addr in $strays; do
+    hyprctl dispatch "hl.dsp.window.move({ workspace = \"special:agent\", window = \"address:$addr\", follow = false })" >/dev/null
+  done
+  exit 0
+fi
+
+hyprctl dispatch 'hl.dsp.workspace.toggle_special("agent")' >/dev/null
