@@ -12,3 +12,7 @@ alias epoch='date "+%s"'
 
 alias dkl="docker ps -lq"
 alias dcu="docker compose up"
+
+# j: jump to a frecent directory (was fasd's `j`; zoxide replaces fasd on Omarchy)
+alias j="z"
+alias ji="zi"   # interactive picker (fzf)
