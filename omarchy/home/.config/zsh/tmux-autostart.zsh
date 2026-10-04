@@ -2,8 +2,9 @@
 # The first one attaches to the session named after this host; if that session is
 # already showing in another window, a throwaway session is created instead (and
 # destroyed when its window closes) so tiled terminals don't mirror each other.
+# Skipped inside Herdr panes, Claude Code, and editor terminals.
 if [[ -o interactive && -t 0 && -t 1 && -z $TMUX && -z $CLAUDECODE && $TERM != dumb \
-      && $TERM_PROGRAM != vscode && -z $INSIDE_EMACS && -z $TMUX_AUTOSTART_DISABLE ]] \
+      && $TERM_PROGRAM != vscode && -z $INSIDE_EMACS && -z $TMUX_AUTOSTART_DISABLE && -z $HERDR_PANE_ID ]] \
    && (( $+commands[tmux] )); then
   () {
     local session=${HOST%%.*}
