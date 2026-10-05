@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Voxtype post-process: tidy punctuation left behind when filler words are
+# dropped ("repo. Um, by the way" -> "repo., by the way" -> "repo. By the way").
+# Reads the transcription on stdin, writes the cleaned text to stdout.
+sed -E '
+  s/([.!?])[[:space:]]*,[[:space:]]*([[:alpha:]])/\1 \u\2/g
+  s/,[[:space:]]*,/,/g
+  s/^[[:space:],]+//
+  s/^([[:lower:]])/\u\1/
+'
