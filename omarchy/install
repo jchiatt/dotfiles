@@ -37,14 +37,15 @@ link() {
 }
 
 cd "$DIR/home"
-# Files are linked one by one, except Omarchy themes: each theme directory is
-# linked whole (omarchy theme set copies themes with cp -r, which would copy
-# per-file symlinks as dangling-prone links instead of their contents).
-find . -path ./.config/omarchy/themes -prune -o -type f -print | sort | while read -r rel; do
+# Files are linked one by one, except Omarchy themes and shell plugins: each
+# theme directory is linked whole (omarchy theme set copies themes with cp -r,
+# which would copy per-file symlinks as dangling-prone links instead of their
+# contents), and so is each plugin, which the shell discovers by directory.
+find . \( -path ./.config/omarchy/themes -o -path ./.config/omarchy/plugins \) -prune -o -type f -print | sort | while read -r rel; do
   link "${rel#./}"
 done
-for theme in .config/omarchy/themes/*/; do
-  [[ -d $theme ]] && link "${theme%/}"
+for dir in .config/omarchy/themes/*/ .config/omarchy/plugins/*/; do
+  [[ -d $dir ]] && link "${dir%/}"
 done
 
 # 4. Voxtype dictation (config is linked above; model + service + GPU here)

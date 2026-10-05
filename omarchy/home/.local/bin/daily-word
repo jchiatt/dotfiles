@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Today's ESV verse + Reformed quote (the jc.daily-word bar widget's data).
+# `daily-word set-key <key>` stores an ESV API key from https://api.esv.org.
+exec ~/.config/omarchy/plugins/jc.daily-word/daily-word "$@"

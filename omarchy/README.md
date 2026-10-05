@@ -9,8 +9,8 @@ git clone https://github.com/jchiatt/dotfiles.git ~/Work/dotfiles
 ~/Work/dotfiles/omarchy/install
 ```
 
-Everything under `home/` is symlinked into `$HOME` (files individually; Omarchy themes as whole
-directories), so editing the live files edits the repo.
+Everything under `home/` is symlinked into `$HOME` (files individually; Omarchy themes and shell plugins
+as whole directories), so editing the live files edits the repo.
 
 ## What's here
 
@@ -28,3 +28,4 @@ directories), so editing the live files edits the repo.
 | `.local/bin/` | `agent-toggle`, `dirsize`, `eachdir`, `pid`, `serve` (Python 3), `ssh-with-reverse`. |
 | `.config/omarchy/themes/rafl` | **rafl** theme (Plum by night): rafl design-system palette, Rose gradient borders, confetti wallpapers, wordmark lock screen. `omarchy theme set rafl` |
 | `.config/omarchy/themes/rafl-blush` | **rafl Blush** (Blush by day): light variant — flat blush surfaces, plum ink, no gold on light. `omarchy theme set rafl-blush` |
+| `.config/omarchy/plugins/jc.daily-word` | **Daily Word** bar widget (center, left of the clock): today's ESV verse and a quote from Reformed church history. Click for the reading popup (←/→ browse days, `c`/`q` copy, `o` open on esv.org); right-click cycles rotate → verse → quote; middle-click refetches. Needs a free ESV API key from [api.esv.org](https://api.esv.org): `daily-word set-key <key>` (stored in `~/.config/daily-word/`, not tracked). Edits under a symlinked plugin need `omarchy restart shell` — the shell's watcher doesn't follow symlinks. |

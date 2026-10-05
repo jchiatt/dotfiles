@@ -1,0 +1,184 @@
+#!/usr/bin/env python3
+"""Daily ESV verse + Reformed quote, for the jc.daily-word bar widget.
+
+  daily-word                  print today's verse and quote
+  daily-word --json [--offset N]
+                              JSON for the widget (N days from today)
+  daily-word set-key <key>    store an ESV API key (https://api.esv.org)
+
+The verse for day-of-year N is line N of verses.txt; the quote walks a fixed
+shuffle of quotes.json. ESV text comes from api.esv.org and is cached per
+reference under ~/.cache/daily-word, so each passage is fetched once.
+"""
+
+import datetime
+import json
+import os
+import random
+import re
+import sys
+import urllib.error
+import urllib.parse
+import urllib.request
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+CONFIG_DIR = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config")) / "daily-word"
+CACHE_DIR = Path(os.environ.get("XDG_CACHE_HOME", Path.home() / ".cache")) / "daily-word"
+KEY_FILE = CONFIG_DIR / "esv-api-key"
+CACHE_LIMIT = 60  # ESV terms limit how much text an app may store locally
+
+ESV_URL = "https://api.esv.org/v3/passage/text/"
+ESV_PARAMS = {
+    "include-passage-references": "false",
+    "include-verse-numbers": "false",
+    "include-first-verse-numbers": "false",
+    "include-footnotes": "false",
+    "include-footnote-body": "false",
+    "include-headings": "false",
+    "include-short-copyright": "false",
+    "include-passage-horizontal-lines": "false",
+    "include-heading-horizontal-lines": "false",
+    "include-selahs": "true",
+    "indent-paragraphs": "0",
+    "indent-poetry": "false",
+}
+
+
+def load_verses():
+    lines = (HERE / "verses.txt").read_text().splitlines()
+    return [l.strip() for l in lines if l.strip() and not l.lstrip().startswith("#")]
+
+
+def load_quotes():
+    return json.loads((HERE / "quotes.json").read_text())
+
+
+def api_key():
+    key = os.environ.get("ESV_API_KEY", "").strip()
+    if not key and KEY_FILE.exists():
+        key = KEY_FILE.read_text().strip()
+    return key
+
+
+def esv_url(reference):
+    return "https://www.esv.org/" + urllib.parse.quote(reference.replace(" ", "+"), safe="+:")
+
+
+def cache_path(reference):
+    return CACHE_DIR / (re.sub(r"[^A-Za-z0-9]+", "_", reference).strip("_") + ".json")
+
+
+def prune_cache():
+    files = sorted(CACHE_DIR.glob("*.json"), key=lambda p: p.stat().st_mtime, reverse=True)
+    for stale in files[CACHE_LIMIT:]:
+        stale.unlink(missing_ok=True)
+
+
+def fetch_passage(reference):
+    """Returns (canonical, text, status, message)."""
+    cached = cache_path(reference)
+    if cached.exists():
+        try:
+            data = json.loads(cached.read_text())
+            return data["canonical"], data["text"], "ok", ""
+        except (ValueError, KeyError):
+            cached.unlink(missing_ok=True)
+
+    key = api_key()
+    if not key:
+        return reference, "", "nokey", "Add a free ESV API key: daily-word set-key <key>"
+
+    url = ESV_URL + "?" + urllib.parse.urlencode({"q": reference, **ESV_PARAMS})
+    req = urllib.request.Request(url, headers={"Authorization": "Token " + key})
+    try:
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            data = json.load(resp)
+    except urllib.error.HTTPError as e:
+        msg = "ESV API rejected the key" if e.code in (401, 403) else f"ESV API error {e.code}"
+        return reference, "", "error", msg
+    except (urllib.error.URLError, TimeoutError, ValueError) as e:
+        return reference, "", "error", "Couldn't reach the ESV API"
+
+    passages = data.get("passages") or []
+    text = re.sub(r"\s+", " ", " ".join(passages)).strip()
+    if not text:
+        return reference, "", "error", "ESV API returned no text"
+    canonical = data.get("canonical") or reference
+
+    CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    cached.write_text(json.dumps({"canonical": canonical, "text": text}))
+    prune_cache()
+    return canonical, text, "ok", ""
+
+
+def pick(day):
+    verses = load_verses()
+    quotes = load_quotes()
+    reference = verses[(day.timetuple().tm_yday - 1) % len(verses)]
+
+    # A fixed shuffle keeps one author's quotes from landing on consecutive days.
+    order = list(range(len(quotes)))
+    random.Random(1517).shuffle(order)
+    quote = quotes[order[day.toordinal() % len(order)]]
+    return reference, quote
+
+
+def entry(offset=0):
+    day = datetime.date.today() + datetime.timedelta(days=offset)
+    reference, quote = pick(day)
+    canonical, text, status, message = fetch_passage(reference)
+    return {
+        "date": day.isoformat(),
+        "offset": offset,
+        "verse": {
+            "reference": canonical,
+            "text": text,
+            "url": esv_url(canonical),
+            "status": status,
+            "message": message,
+        },
+        "quote": {
+            "text": quote.get("text", ""),
+            "author": quote.get("author", ""),
+            "source": quote.get("source", ""),
+        },
+    }
+
+
+def set_key(key):
+    key = key.strip()
+    if not key:
+        sys.exit("usage: daily-word set-key <key>")
+    CONFIG_DIR.mkdir(parents=True, exist_ok=True)
+    KEY_FILE.write_text(key + "\n")
+    KEY_FILE.chmod(0o600)
+    print(f"Saved ESV API key to {KEY_FILE}")
+
+
+def main(argv):
+    if argv[:1] == ["set-key"]:
+        return set_key(argv[1] if len(argv) > 1 else "")
+
+    offset = 0
+    if "--offset" in argv:
+        try:
+            offset = int(argv[argv.index("--offset") + 1])
+        except (IndexError, ValueError):
+            sys.exit("usage: daily-word [--json] [--offset N]")
+
+    data = entry(offset)
+    if "--json" in argv:
+        print(json.dumps(data, ensure_ascii=False))
+        return
+
+    v, q = data["verse"], data["quote"]
+    print(f"{v['reference']} (ESV)")
+    print(f"  {v['text'] or v['message']}")
+    print()
+    print(f"“{q['text']}”")
+    print(f"  — {q['author']}" + (f", {q['source']}" if q["source"] else ""))
+
+
+if __name__ == "__main__":
+    main(sys.argv[1:])
