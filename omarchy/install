@@ -40,12 +40,15 @@ cd "$DIR/home"
 # Files are linked one by one, except Omarchy themes: each theme directory is
 # linked whole (omarchy theme set copies themes with cp -r, which would copy
 # per-file symlinks as dangling-prone links instead of their contents).
-find . -path ./.config/omarchy/themes -prune -o -type f -print | sort | while read -r rel; do
+# ~/.config/voxtype is linked whole too: `voxtype configure` / `config set`
+# rewrite config.toml atomically, which replaces a per-file symlink.
+find . \( -path ./.config/omarchy/themes -o -path ./.config/voxtype \) -prune -o -type f -print | sort | while read -r rel; do
   link "${rel#./}"
 done
 for theme in .config/omarchy/themes/*/; do
   [[ -d $theme ]] && link "${theme%/}"
 done
+link .config/voxtype
 
 # 4. Voxtype dictation (config is linked above; model + service + GPU here)
 if command -v voxtype &>/dev/null; then

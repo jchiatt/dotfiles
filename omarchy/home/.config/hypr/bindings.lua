@@ -28,6 +28,14 @@
 -- o.bind("SUPER + H", nil, "voxtype record toggle")
 -- o.bind("SUPER + PERIOD", nil, "omarchy-shell shell toggle omarchy.emojis")
 
+-- Wispr Flow-style dictation (Omarchy's SUPER+CTRL+X toggle and F9 push-to-talk still work).
+-- Hold Right Alt (code:108, where Right Cmd sits on a Mac) to talk; the bind swallows the key,
+-- so its Compose role lives on Right Ctrl instead (see input.lua).
+o.bind("code:108", "Start dictation (hold Right Alt)", "voxtype record start")
+o.bind("code:108", "Stop dictation (release Right Alt)", "voxtype record stop", { release = true })
+-- Hands-free: press once to start, again to stop (Ctrl+Opt+Cmd+Space on a Mac).
+o.bind("CTRL + ALT + SUPER + SPACE", "Toggle dictation (hands-free)", "voxtype record toggle")
+
 -- Center the focused floating window.
 o.bind("SUPER + ALT + C", "Center floating window", hl.dsp.window.center())
 

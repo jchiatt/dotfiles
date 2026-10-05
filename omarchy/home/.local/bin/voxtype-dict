@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+# Wispr Flow-style dictionary for Voxtype.
+#
+#   voxtype-dict word "Herdr" ["Praxient" ...]   teach whisper how to spell a name/term
+#   voxtype-dict fix "sink thing" "Syncthing"    always rewrite a mishearing (or a snippet:
+#                                                voxtype-dict fix "my address" "123 Main St")
+#   voxtype-dict rm "sink thing"                 remove a fix/snippet
+#   voxtype-dict list                            show vocabulary and fixes
+#   voxtype-dict edit                            open the config in $EDITOR
+#
+# Changes go through `voxtype config set` (comments preserved) and restart the daemon.
+set -euo pipefail
+
+config=${VOXTYPE_CONFIG:-$HOME/.config/voxtype/config.toml}
+vt() { voxtype -c "$config" "$@"; }
+
+restart() {
+  systemctl --user restart voxtype
+  echo "voxtype restarted"
+}
+
+case ${1:-} in
+  word)
+    shift
+    (($#)) || { echo "usage: voxtype-dict word <term>..." >&2; exit 1; }
+    prompt=$(vt config get whisper.initial_prompt)
+    [[ $prompt == null ]] && prompt=""
+    for term; do
+      if [[ $prompt == *"$term"* ]]; then
+        echo "already known: $term"
+      else
+        prompt="${prompt:+$prompt }$term."
+      fi
+    done
+    vt config set whisper.initial_prompt "$prompt" >/dev/null
+    echo "vocabulary: $prompt"
+    restart
+    ;;
+  fix)
+    (($# == 3)) || { echo "usage: voxtype-dict fix <heard> <wanted>" >&2; exit 1; }
+    vt config set "text.replacements.$2" "$3" >/dev/null
+    echo "fix: \"$2\" -> \"$3\""
+    restart
+    ;;
+  rm)
+    (($# == 2)) || { echo "usage: voxtype-dict rm <heard>" >&2; exit 1; }
+    vt config unset "text.replacements.$2" >/dev/null
+    echo "removed: \"$2\""
+    restart
+    ;;
+  list)
+    echo "Vocabulary (whisper.initial_prompt):"
+    echo "  $(vt config get whisper.initial_prompt)"
+    echo
+    echo "Fixes and snippets (text.replacements):"
+    sed -n '/^\[text\.replacements\]/,/^\[/{/^"/s/^/  /p}' "$config"
+    ;;
+  edit)
+    "${EDITOR:-nvim}" "$config"
+    restart
+    ;;
+  *)
+    sed -n '2,11s/^# \{0,1\}//p' "$0"
+    exit 1
+    ;;
+esac

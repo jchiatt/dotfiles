@@ -47,10 +47,11 @@
 -- Mac-style modifiers:
 --   ctrl:nocaps           Caps Lock acts as Control
 --   altwin:swap_lalt_lwin Left Alt <-> Left Super (Super sits next to space, like Cmd)
---   compose:ralt          Compose moves to Right Alt (Omarchy defaults it to Caps Lock)
+--   compose:ralt          Right Alt becomes a plain (non-modifier) key; bindings.lua uses it for push-to-talk
+--   compose:rctrl         Compose on Right Ctrl (Omarchy defaults it to Caps Lock)
 hl.config({
   input = {
-    kb_options = "ctrl:nocaps,altwin:swap_lalt_lwin,compose:ralt,shift:both_capslock_cancel",
+    kb_options = "ctrl:nocaps,altwin:swap_lalt_lwin,compose:ralt,compose:rctrl,shift:both_capslock_cancel",
 
     -- Mac-style "natural" (inverted) scrolling for mice and the touchpad
     natural_scroll = true,
