@@ -1,41 +1,26 @@
 import QtQuick
+import Quickshell
 import Quickshell.Io
 import qs.Commons
 import qs.Ui
 
-// Bar label for the daily verse + quote, and host for the reading popup.
-// Left click opens the popup, right click cycles what the bar shows
-// (rotate → verse → quote), middle click refetches.
+// Bar label for the daily verse (cross + reference), and host for the reading
+// popup. Hovering shows the verse text in a wrapped card; left click opens the
+// popup with the verse and quote; middle click refetches.
 BarWidget {
   id: root
   moduleName: "jc.daily-word"
 
   readonly property var panel: panelLoader.item
   readonly property var today: panel ? panel.today : null
+  readonly property var verse: today ? today.verse : null
 
-  // "verse" | "quote" | "rotate"; right click overrides shell.json until restart.
-  property string displayOverride: ""
-  readonly property string display: displayOverride !== "" ? displayOverride : String(setting("display", "rotate"))
-  readonly property int maxChars: Math.max(16, Number(setting("maxChars", 60)) || 60)
-  property bool showingQuote: display === "quote"
+  readonly property string reference: verse ? verse.reference : ""
+  readonly property string hoverText: verse ? (verse.text || verse.message) : ""
 
-  readonly property string verseLine: {
-    if (!today) return ""
-    var v = today.verse
-    return v.text ? v.reference + " — " + v.text : v.reference
-  }
-  readonly property string quoteLine: today ? today.quote.text + " — " + today.quote.author : ""
-  readonly property string fullLine: showingQuote ? quoteLine : verseLine
-  readonly property string icon: showingQuote ? "" : "󰥓"  // nf-fa-quote_left, nf-md-cross
-
-  function clip(text) {
-    return text.length > maxChars ? text.slice(0, maxChars - 1).replace(/[\s,;:—-]+$/, "") + "…" : text
-  }
-
-  function cycleDisplay() {
-    displayOverride = display === "rotate" ? "verse" : (display === "verse" ? "quote" : "rotate")
-    showingQuote = displayOverride === "quote"
-  }
+  // The bar's shared tooltip is one unwrapped line, so the hover card is our
+  // own: as wide as the widget, but never narrower than hoverMinWidth.
+  readonly property real hoverWidth: Math.max(button.width, Style.space(Number(setting("hoverMinWidth", 280)) || 280))
 
   function refresh() { if (panel) panel.refresh() }
 
@@ -58,27 +43,12 @@ BarWidget {
     if ("hostWidget" in target) target.hostWidget = root
   }
 
-  visible: !vertical && fullLine !== ""
+  visible: !vertical && reference !== ""
   implicitWidth: button.implicitWidth
   implicitHeight: button.implicitHeight
 
   onBarChanged: injectPanel()
   onSettingsChanged: injectPanel()
-  onDisplayChanged: if (display !== "rotate") showingQuote = display === "quote"
-
-  Timer {
-    interval: Math.max(5, Number(root.setting("rotateSeconds", 60)) || 60) * 1000
-    running: root.display === "rotate" && !root.opened
-    repeat: true
-    onTriggered: fade.restart()
-  }
-
-  SequentialAnimation {
-    id: fade
-    NumberAnimation { target: button; property: "opacity"; to: 0; duration: 180; easing.type: Easing.InCubic }
-    ScriptAction { script: root.showingQuote = !root.showingQuote }
-    NumberAnimation { target: button; property: "opacity"; to: 1; duration: 220; easing.type: Easing.OutCubic }
-  }
 
   Loader {
     id: panelLoader
@@ -104,14 +74,85 @@ BarWidget {
     id: button
     anchors.fill: parent
     bar: root.bar
-    text: root.icon + "  " + root.clip(root.fullLine)
-    tooltipText: root.opened ? "" : root.fullLine
+    text: "󰥓  " + root.reference  // nf-md-cross
     horizontalMargin: 8.75
 
     onPressed: function(b) {
-      if (b === Qt.RightButton) root.cycleDisplay()
-      else if (b === Qt.MiddleButton) root.refresh()
-      else root.togglePanel()
+      hoverDelay.stop()
+      hoverCard.shown = false
+      if (b === Qt.MiddleButton) root.refresh()
+      else if (b === Qt.LeftButton) root.togglePanel()
+    }
+  }
+
+  HoverHandler {
+    id: hover
+    onHoveredChanged: {
+      if (hovered && !root.opened && root.hoverText !== "") hoverDelay.restart()
+      else { hoverDelay.stop(); hoverCard.shown = false }
+    }
+  }
+
+  Timer {
+    id: hoverDelay
+    interval: 400
+    onTriggered: hoverCard.shown = hover.hovered && !root.opened
+  }
+
+  PopupWindow {
+    id: hoverCard
+
+    property bool shown: false
+
+    visible: shown && !root.opened && root.hoverText !== ""
+    color: "transparent"
+    implicitWidth: Math.ceil(root.hoverWidth)
+    implicitHeight: Math.ceil(bubble.implicitHeight)
+
+    anchor {
+      id: hoverAnchor
+      window: button.QsWindow.window
+      adjustment: PopupAdjustment.Slide
+      edges: Edges.Top | Edges.Left
+      gravity: Edges.Bottom | Edges.Right
+      rect.width: 1
+      rect.height: 1
+
+      onAnchoring: {
+        var window = button.QsWindow.window
+        if (!window) return
+        var bottom = root.bar && root.bar.position === "bottom"
+        var localX = button.width / 2 - hoverCard.implicitWidth / 2
+        var localY = bottom ? -hoverCard.implicitHeight - 6 : button.height + 6
+        var point = window.contentItem.mapFromItem(button, localX, localY)
+        hoverAnchor.rect.x = Math.round(Math.max(6, Math.min(point.x, window.width - hoverCard.implicitWidth - 6)))
+        hoverAnchor.rect.y = Math.round(point.y)
+      }
+    }
+
+    BorderSurface {
+      id: bubble
+      width: parent.width
+      implicitHeight: hoverLabel.implicitHeight + 14
+      color: Color.tooltip.background
+      borderSpec: Border.surfaceSpec("tooltip", "border", Color.tooltip.border, 1)
+      radius: Style.cornerRadius
+
+      Text {
+        id: hoverLabel
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.leftMargin: 10
+        anchors.rightMargin: 10
+        textFormat: Text.PlainText
+        wrapMode: Text.WordWrap
+        lineHeight: 1.2
+        text: root.hoverText
+        color: Color.tooltip.text
+        font.family: root.bar ? root.bar.fontFamily : Style.font.family
+        font.pixelSize: Style.font.body
+      }
     }
   }
 }

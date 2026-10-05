@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "jc.daily-word",
   "name": "Daily Word",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "author": "jc",
   "description": "Daily ESV verse and a quote from Reformed church history",
   "kinds": [
@@ -13,19 +13,19 @@
   },
   "barWidget": {
     "displayName": "Daily Word",
-    "description": "Daily ESV verse and a Reformed quote, with a reading popup",
+    "description": "Cross + today's ESV reference; hover for the verse, click for the verse and a Reformed quote",
     "category": "Info",
     "allowMultiple": false,
     "defaultSection": "center",
     "defaults": {
-      "display": "rotate",
-      "rotateSeconds": 60,
-      "maxChars": 60
+      "hoverMinWidth": 280
     },
     "schema": [
-      { "key": "display", "type": "string", "label": "Bar shows: verse, quote, or rotate" },
-      { "key": "rotateSeconds", "type": "number", "label": "Rotate interval (seconds)" },
-      { "key": "maxChars", "type": "number", "label": "Max characters in the bar" }
+      {
+        "key": "hoverMinWidth",
+        "type": "number",
+        "label": "Minimum hover card width (px)"
+      }
     ]
   }
 }
