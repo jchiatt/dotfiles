@@ -31,8 +31,9 @@ CACHE_LIMIT = 60  # ESV terms limit how much text an app may store locally
 ESV_URL = "https://api.esv.org/v3/passage/text/"
 ESV_PARAMS = {
     "include-passage-references": "false",
-    "include-verse-numbers": "false",
-    "include-first-verse-numbers": "false",
+    # Numbers on so clean_text() can drop psalm superscriptions before [1].
+    "include-verse-numbers": "true",
+    "include-first-verse-numbers": "true",
     "include-footnotes": "false",
     "include-footnote-body": "false",
     "include-headings": "false",
@@ -75,6 +76,15 @@ def prune_cache():
         stale.unlink(missing_ok=True)
 
 
+def clean_text(passages):
+    text = " ".join(passages)
+    first = re.search(r"\[\d+\]", text)
+    if first:
+        text = text[first.start():]
+    text = re.sub(r"\[\d+\]\s*", "", text)
+    return re.sub(r"\s+", " ", text).strip()
+
+
 def fetch_passage(reference):
     """Returns (canonical, text, status, message)."""
     cached = cache_path(reference)
@@ -101,7 +111,7 @@ def fetch_passage(reference):
         return reference, "", "error", "Couldn't reach the ESV API"
 
     passages = data.get("passages") or []
-    text = re.sub(r"\s+", " ", " ".join(passages)).strip()
+    text = clean_text(passages)
     if not text:
         return reference, "", "error", "ESV API returned no text"
     canonical = data.get("canonical") or reference
