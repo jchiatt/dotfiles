@@ -1,6 +1,6 @@
-# cmux has its own tabs/splits/persistence; do not nest tmux inside it.
-# cmux exports CMUX_WORKSPACE_ID / CMUX_SOCKET_PATH to every shell it spawns.
-if [ -n "$CMUX_WORKSPACE_ID" ] || [ -n "$CMUX_SOCKET_PATH" ]; then
+# cmux and Herdr have their own tabs/splits/persistence; do not nest tmux inside them.
+# cmux exports CMUX_WORKSPACE_ID / CMUX_SOCKET_PATH; Herdr exports HERDR_ENV=1.
+if [ -n "$CMUX_WORKSPACE_ID" ] || [ -n "$CMUX_SOCKET_PATH" ] || [ "${HERDR_ENV:-}" = "1" ]; then
   return 0
 fi
 
