@@ -1,0 +1,56 @@
+# Match the iTerm2 profile: FiraCode Nerd Font Mono Regular, 14pt
+font-family = "FiraCode Nerd Font Mono"
+font-size = 14
+
+# Cyberpunk Neon (https://github.com/roboron3042/cyberpunk-neon, terminal/kitty) — 2026-10-29
+# Note: the theme deliberately maps white (7/15) to neon cyan; that is its look.
+background = #000b1e
+foreground = #0abdc6
+cursor-color = #0abdc6
+cursor-text = #000b1e
+selection-background = #711c91
+selection-foreground = #ffffff
+palette = 0=#000b1e
+palette = 1=#ff0000
+palette = 2=#d300c4
+palette = 3=#f57800
+palette = 4=#133e7c
+palette = 5=#711c91
+palette = 6=#0abdc6
+palette = 7=#0abdc6
+palette = 8=#1c61c2
+palette = 9=#ff0000
+palette = 10=#d300c4
+palette = 11=#ff5780
+palette = 12=#00ff00
+palette = 13=#711c91
+palette = 14=#0abdc6
+palette = 15=#0abdc6
+# Optional neon-glass look; uncomment to try:
+# background-opacity = 0.92
+# background-blur = true
+
+# Previous theme — Vercel (https://ghostty-style.vercel.app/config/vercel). Swap back by
+# commenting the block above and uncommenting this one.
+# palette = 0=#000000
+# palette = 1=#fc0036
+# palette = 2=#29a948
+# palette = 3=#ffae00
+# palette = 4=#006aff
+# palette = 5=#f32882
+# palette = 6=#00ac96
+# palette = 7=#feffff
+# palette = 8=#a8a8a8
+# palette = 9=#ff8080
+# palette = 10=#4be15d
+# palette = 11=#ffae00
+# palette = 12=#49aeff
+# palette = 13=#f97ea8
+# palette = 14=#00e4c4
+# palette = 15=#fefefe
+# background = #101010
+# foreground = #fafafa
+# cursor-color = #f32882
+# cursor-text = #fafafa
+# selection-background = #005be7
+# selection-foreground = #fafafa

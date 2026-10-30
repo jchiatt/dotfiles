@@ -1,0 +1,60 @@
+{
+  "$schema": "https://raw.githubusercontent.com/manaflow-ai/cmux/main/web/data/cmux.schema.json",
+  "schemaVersion": 1,
+  // Standard cmux config, shared across machines via dotfiles (files/cmux/cmux.json -> ~/.config/cmux/cmux.json).
+  // Machine-agnostic on purpose: colors/fonts come from ~/.config/ghostty/config (also in dotfiles).
+  // Reference for every option: cmux Settings, or the cmux.schema.json linked above.
+
+  "app": {
+    "appearance": "dark",
+    "warnBeforeClosingTab": false,
+    "warnBeforeClosingWorkspace": true,
+    "warnBeforeClosingAgentSession": true
+  },
+
+  "sidebarAppearance": {
+    "matchTerminalBackground": true,
+    "tintColor": "#000b1e",
+    "tintOpacity": 0.25
+  },
+
+  // Neon workspace tags (right-click a workspace → color)
+  "workspaceColors": {
+    "brightenInDarkMode": true,
+    "indicatorStyle": "leftRail",
+    "colors": {
+      "Cyan": "#0abdc6",
+      "Magenta": "#ea00d9",
+      "Purple": "#711c91",
+      "Blue": "#133e7c",
+      "Orange": "#f57800",
+      "Pink": "#ff5780",
+      "Lime": "#00ff00",
+      "Red": "#ff0000"
+    }
+  },
+
+  "terminal": {
+    // Prompt-box launchers (Cmd+Shift+A): plain Claude is the default; skip-permissions is an explicit second choice.
+    "textBoxDefaultSubmitAction": "claude",
+    "textBoxSubmitActions": [
+      { "id": "claude", "title": "Claude", "kind": "commandTemplate",
+        "commandTemplate": "claude -- {{prompt}}",
+        "assetName": "AgentIcons/Claude", "systemImage": "sparkle", "backgroundColorHex": "#0abdc6" },
+      { "id": "claude-yolo", "title": "Claude (skip permissions)", "kind": "commandTemplate",
+        "commandTemplate": "claude --dangerously-skip-permissions -- {{prompt}}",
+        "assetName": "AgentIcons/Claude", "systemImage": "sparkle", "backgroundColorHex": "#ff5780" },
+      { "id": "codex", "title": "Codex", "kind": "commandTemplate",
+        "commandTemplate": "codex -- {{prompt}}",
+        "assetName": "AgentIcons/Codex", "systemImage": "sparkles", "backgroundColorHex": "#711c91" }
+    ]
+  },
+
+  // Keybindings: deliberately left at cmux defaults while learning the native scheme (2026-10-29).
+  // Override one at a time here, e.g. "splitRight": "cmd+d". Arrays make chords: ["ctrl+b", "c"].
+  // Full action list: cmux.defaults-0.65.2.jsonc → "shortcuts".
+  "shortcuts": {
+    "bindings": {
+    }
+  }
+}
