@@ -39,9 +39,6 @@ rows = [
       { equals = "twisters", fg = "#ff0000" },
       { equals = "ventures", fg = "#0abdc6" },
       { equals = "finances", fg = "#711c91" },
-      { equals = "wrightway", fg = "#ea00d9" },
-      { equals = "handoff-2026-09-22", fg = "#ea00d9" },
-      { equals = "smoothcomp-s10-qualifier", fg = "#ff0000" },
    ] }],
   ["state_icon", "terminal_title_stripped"],
 ]
