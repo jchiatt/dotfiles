@@ -1,0 +1,61 @@
+# herdr config (Mac) — 2026-10-29. Full reference: `herdr --default-config`.
+# Apply edits live: `herdr server reload-config`.
+onboarding = false
+
+[ui]
+status_indicators = "symbols"
+# Agent panel: order by workspace so each project's threads sit together (2026-10-29)
+agent_panel_sort = "spaces"
+
+[ui.toast]
+# macOS: native notification center
+delivery = "system"
+delay_seconds = 1
+
+[ui.sound]
+enabled = true
+
+# Cyberpunk Neon — inherit the terminal palette, neon accents for Herdr chrome (2026-10-29)
+[theme]
+name = "terminal"
+
+[theme.custom]
+accent = "#ea00d9"
+sidebar_bg = "#000b1e"
+active_row_bg = "#133e7c"
+selection_bg = "#711c91"
+
+# Sidebar layout (2026-10-29): project tag first, colored per venture with the cmux palette,
+# then the session title. Approximates FleetView's per-project grouping (Herdr has no collapsible agent groups yet).
+[ui.sidebar.agents]
+row_gap = 0
+rows = [
+  [{ token = "machine", rules = [{ equals = "Local", hide = true }] },
+   { token = "workspace", bold = true, rules = [
+      { equals = "praxient", fg = "#ff5780" },
+      { equals = "rafl",     fg = "#00ff00" },
+      { equals = "grapple",  fg = "#133e7c" },
+      { equals = "health",   fg = "#f57800" },
+      { equals = "twisters", fg = "#ff0000" },
+      { equals = "ventures", fg = "#0abdc6" },
+      { equals = "finances", fg = "#711c91" },
+      { equals = "handoff-2026-09-22", fg = "#ea00d9" },
+      { equals = "smoothcomp-s10-qualifier", fg = "#ff0000" },
+   ] }],
+  ["state_icon", "terminal_title_stripped"],
+]
+
+[ui.sidebar.spaces]
+row_gap = 0
+rows = [
+  ["state_icon", { token = "workspace", bold = true }],
+  ["branch", "git_status"],
+]
+
+# Keys (2026-10-30): backtick prefix like tmux (press twice for a literal `), ctrl+b kept as fallback;
+# direct workspace switching (prefix+j/k, prefix+shift+1..9).
+[keys]
+prefix = ["backtick", "ctrl+b"]
+previous_workspace = "prefix+k"
+next_workspace = "prefix+j"
+switch_workspace = "prefix+shift+1..9"

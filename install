@@ -8,7 +8,7 @@ source "${SCRIPT_PATH}/.installer/lib/install.lib.sh"
 
 SHELLRC_PATH=${SHELLRC_PATH:-~/.shellrc}
 
-mkdir -p "${HOME}/.shellrc/local.d" "${HOME}/bin" "${HOME}/.shellrc/plugins" "${HOME}/.config/cmux" "${HOME}/.config/ghostty"
+mkdir -p "${HOME}/.shellrc/local.d" "${HOME}/bin" "${HOME}/.shellrc/plugins" "${HOME}/.config/cmux" "${HOME}/.config/ghostty" "${HOME}/.config/herdr"
 
 # Clean up broken symlinks
 find "${HOME}" -maxdepth 1 -type l -exec test ! -e {} \; -print
@@ -34,6 +34,7 @@ declare -A DOTMAP=(
   [.tmuxrc]=files/tmux/tmuxrc
   [.config/cmux/cmux.json]=files/cmux/cmux.json
   [.config/ghostty/config]=files/ghostty/config
+  [.config/herdr/config.toml]=files/herdr/config.toml
 ) 
 
 for file in "${!DOTMAP[@]}"; do
