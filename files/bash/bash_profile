@@ -1,5 +1,13 @@
 
-if [ -f $HOME/.bashrc ]; then
+# A login bash reads only this file once it exists, so also read ~/.profile,
+# where Debian and installers put login PATH (~/.local/bin, mise shims, cargo).
+# Debian's ~/.profile sources ~/.bashrc itself; don't load it twice.
+unset _SHELLRC_BASHRC_LOADED
+if [ -f "$HOME/.profile" ]; then
+  . "$HOME/.profile"
+fi
+
+if [ -z "${_SHELLRC_BASHRC_LOADED:-}" ] && [ -f $HOME/.bashrc ]; then
   source $HOME/.bashrc
 fi
 

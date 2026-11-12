@@ -10,4 +10,5 @@ source $HOME/.shellrc/init
 for _shell_path in shellrc.d login.d local.d "platform.d/${OSTYPE}"; do
     _load_shellrc_path $_shell_path
 done
+_SHELLRC_BASHRC_LOADED=1
 [ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
