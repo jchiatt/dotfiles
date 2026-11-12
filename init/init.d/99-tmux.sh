@@ -4,6 +4,7 @@ if [ -n "$CMUX_WORKSPACE_ID" ] || [ -n "$CMUX_SOCKET_PATH" ] || [ "${HERDR_ENV:-
   return 0
 fi
 
-if [ -z "$TMUX" ]; then
+# Only attach from a real terminal: `zsh -ic '…'` from scripts and tools has no tty.
+if [ -z "$TMUX" ] && [ -t 0 ] && [ -t 1 ]; then
   command tmux new -A -s "$(hostname -s)"
 fi
