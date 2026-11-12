@@ -55,6 +55,14 @@ _build_load_regex()
 # trying to init the incorrect one.
 _detect_shell()
 {
+  # The version variables are set by the shell itself, even under `zsh -c`,
+  # where the ps command line ends in the script rather than the shell's name.
+  if [ -n "${ZSH_VERSION:-}" ]; then
+    echo 'zsh'; return
+  elif [ -n "${BASH_VERSION:-}" ]; then
+    echo 'bash'; return
+  fi
+
   local SHELL_COMMAND=$(basename -- "$(ps -p $$ | tail -1 | awk '{print $NF}')")
 
   if [[ "${SHELL_COMMAND}" =~ bash ]]; then
