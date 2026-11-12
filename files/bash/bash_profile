@@ -3,4 +3,4 @@ if [ -f $HOME/.bashrc ]; then
   source $HOME/.bashrc
 fi
 
-. "$HOME/.cargo/env"
+[ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
